@@ -1,0 +1,3317 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitPick - Фитнес Клуб Ұсыныс Жүйесі</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff6b35;
+            --primary-dark: #e55a2b;
+            --secondary: #1a1a2e;
+            --accent: #00d4aa;
+            --bg: #0f0f1a;
+            --card: #1a1a2e;
+            --card-hover: #252540;
+            --text: #ffffff;
+            --text-muted: #a0a0b8;
+            --border: #2a2a45;
+            --gradient-1: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            --gradient-2: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            --shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .orb-1 { width: 400px; height: 400px; background: var(--primary); top: -100px; left: -100px; animation-delay: 0s; }
+        .orb-2 { width: 300px; height: 300px; background: var(--accent); top: 50%; right: -50px; animation-delay: -5s; }
+        .orb-3 { width: 350px; height: 350px; background: #7c3aed; bottom: -100px; left: 30%; animation-delay: -10s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(0.9); }
+            75% { transform: translate(20px, 20px) scale(1.05); }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(15, 15, 26, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 40px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo i {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 28px;
+        }
+
+        .logo span {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav {
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--text);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-1);
+            transition: width 0.3s;
+            border-radius: 2px;
+        }
+
+        nav a:hover::after, nav a.active::after {
+            width: 100%;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--card);
+            border-color: var(--primary);
+        }
+
+        .btn-sm { padding: 8px 16px; font-size: 13px; }
+
+        /* Main Content */
+        main {
+            padding-top: 70px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 107, 53, 0.15);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.3); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 107, 53, 0); }
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #fff 0%, #a0a0b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero h1 span {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 60px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 100px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Quiz / Preference Form */
+        .quiz-container {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 50px;
+            border: 1px solid var(--border);
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+        }
+
+        .quiz-step {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .quiz-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .quiz-step h3 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .quiz-step .step-desc {
+            color: var(--text-muted);
+            margin-bottom: 30px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.15);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary);
+            background: rgba(255, 107, 53, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+        }
+
+        .option-card i {
+            font-size: 32px;
+            margin-bottom: 12px;
+            display: block;
+            color: var(--primary);
+        }
+
+        .option-card h4 {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .option-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--bg);
+            border-radius: 3px;
+            margin-right: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-1);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .step-counter {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-right: 20px;
+        }
+
+        /* Range Slider */
+        .range-container {
+            margin: 30px 0;
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .range-value {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 20px 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gradient-1);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .match-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card);
+            padding: 12px 30px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .match-score i {
+            color: #fbbf24;
+            font-size: 20px;
+        }
+
+        .match-score span {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Filters */
+        .filters-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-chip {
+            padding: 8px 18px;
+            border-radius: 50px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-chip:hover, .filter-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Club Cards */
+        .clubs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .club-card {
+            background: var(--card);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.4s;
+            position: relative;
+        }
+
+        .club-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        .club-card.featured::before {
+            content: 'ТОП ҰСЫНЫС';
+            position: absolute;
+            top: 16px;
+            right: -30px;
+            background: var(--gradient-1);
+            color: white;
+            padding: 4px 40px;
+            font-size: 11px;
+            font-weight: 700;
+            transform: rotate(45deg);
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .club-image {
+            height: 200px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #2a2a45 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .club-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .club-card:hover .club-image img {
+            transform: scale(1.1);
+        }
+
+        .club-image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        }
+
+        .club-rating {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #fbbf24;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .club-rating span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 12px;
+        }
+
+        .club-body {
+            padding: 24px;
+        }
+
+        .club-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .club-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .club-location {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .club-price {
+            text-align: right;
+        }
+
+        .club-price .price {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .club-price .period {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .club-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(0, 212, 170, 0.2);
+        }
+
+        .tag.orange {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--primary);
+            border-color: rgba(255, 107, 53, 0.2);
+        }
+
+        .club-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .feature i {
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .club-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .club-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .match-percentage {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+        }
+
+        /* Comparison Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal {
+            background: var(--card);
+            border-radius: 24px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .compare-table th, .compare-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .compare-table th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .compare-table td {
+            font-size: 14px;
+        }
+
+        .compare-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Booking Modal */
+        .booking-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Favorites */
+        .favorites-bar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+        }
+
+        .fav-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-1);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .fav-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .fav-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent);
+            color: var(--secondary);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 90px;
+            right: 30px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.4s ease-out;
+            min-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast.success { border-left: 4px solid var(--accent); }
+        .toast.error { border-left: 4px solid #ef4444; }
+        .toast.info { border-left: 4px solid var(--primary); }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 15, 26, 0.95);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: var(--text-muted);
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { padding: 0 20px; }
+            nav { display: none; }
+            .hero h1 { font-size: 36px; }
+            .hero-stats { flex-direction: column; gap: 20px; }
+            .section { padding: 60px 20px; }
+            .quiz-container { padding: 30px 20px; }
+            .clubs-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .modal-overlay { padding: 20px; }
+        }
+
+        /* AI TRAINER STYLES */
+        .ai-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .ai-form-grid .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ai-form-grid .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .ai-form-grid .form-group select,
+        .ai-form-grid .form-group input {
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .ai-form-grid .form-group select:focus,
+        .ai-form-grid .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        .ai-tab-btn {
+            transition: all 0.3s;
+        }
+
+        .ai-tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+            color: white !important;
+            border-color: transparent !important;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .ai-tab-content {
+            display: block;
+        }
+
+        .workout-day {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+        }
+
+        .workout-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .workout-day-header h4 {
+            font-size: 16px;
+            color: var(--primary);
+        }
+
+        .day-type {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--primary);
+        }
+
+        .exercise-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .exercise-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        .exercise-item i {
+            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .exercise-item span {
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .exercise-item .sets {
+            margin-left: auto;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .meal-card {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+        }
+
+        .meal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .meal-header i {
+            font-size: 24px;
+            color: var(--accent);
+        }
+
+        .meal-header h4 {
+            font-size: 16px;
+            flex: 1;
+        }
+
+        .meal-calories {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            background: rgba(0, 212, 170, 0.1);
+            color: var(--accent);
+        }
+
+        .meal-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .meal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .sleep-plan {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .sleep-hours {
+            font-size: 64px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .sleep-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .sleep-item {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        .sleep-item i {
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: block;
+            font-size: 20px;
+        }
+
+        .sleep-item h5 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .sleep-item p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .ai-form-grid { grid-template-columns: 1fr; }
+            .sleep-grid { grid-template-columns: 1fr; }
+        }
+
+                /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        .slide-up { animation: fadeInUp 0.5s ease-out; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: var(--border);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+        }
+
+        /* Section: Why Us */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 40px 30px;
+            border: 1px solid var(--border);
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.4s;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: rgba(255, 107, 53, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .feature-icon i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* Reviews */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .review-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .review-meta h4 {
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .review-meta .review-stars {
+            color: #fbbf24;
+            font-size: 13px;
+        }
+
+        .review-text {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        .review-club {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 60px 40px 30px;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            margin-top: 16px;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .footer-links h4 {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .footer-content { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
+        }
+
+        /* Heart animation */
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.3); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.3); }
+            70% { transform: scale(1); }
+        }
+
+        .heart-active {
+            animation: heartBeat 0.5s ease-in-out;
+            color: #ef4444 !important;
+        }
+
+        /* Chart bars for comparison */
+        .bar-chart {
+            height: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <header>
+        <a href="#" class="logo">
+            <i class="fas fa-dumbbell"></i>
+            Fit<span>Pick</span>
+        </a>
+        <nav>
+            <a href="#home" class="active">Басты бет</a>
+            <a href="#quiz">Тест</a>
+            <a href="#clubs">Клубтар</a>
+                <a href="#ai-trainer">AI Жаттықтырушы</a>
+            <a href="#ai-trainer">AI Жаттықтырушы</a>
+            <a href="#why-us">Неліктен біз?</a>
+            <a href="#reviews">Пікірлер</a>
+        </nav>
+        <div class="header-actions">
+            <button class="btn btn-outline btn-sm" onclick="scrollToSection('ai-trainer')" style="border-color: var(--accent); color: var(--accent);">
+                <i class="fas fa-robot"></i> AI Жаттықтырушы
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="scrollToSection('quiz')">
+                <i class="fas fa-magic"></i> Ұсыныс алу
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-sparkles"></i>
+                    Жасанды интеллект негізіндегі ұсыныс жүйесі
+                </div>
+                <h1>Сізге <span>ең үздік</span> фитнес клубты табамыз</h1>
+                <p>Мақсаттарыңызды, бюджетіңізді және қалауыңызды ескере отырып, қаладағы ең жақсы фитнес клубтарды іріктеп, салыстырып, талдап береміз.</p>
+                <button class="btn btn-primary" style="padding: 16px 40px; font-size: 16px;" onclick="scrollToSection('quiz')">
+                    <i class="fas fa-play"></i> Тестті бастау
+                </button>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-value">50+</div>
+                        <div class="stat-label">Клубтар</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">12K+</div>
+                        <div class="stat-label">Қанағаттанған қолданушы</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">98%</div>
+                        <div class="stat-label">Дәлдік</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Quiz -->
+        <section class="section" id="quiz">
+            <div class="section-header">
+                <h2>Сізге лайықты клубты табу</h2>
+                <p>5 қарапайым сұраққа жауап беріп, жеке ұсыныстарыңызды алыңыз</p>
+            </div>
+            <div class="quiz-container">
+                <!-- Step 1 -->
+                <div class="quiz-step active" data-step="1">
+                    <h3>🎯 Фитнес мақсатыңыз қандай?</h3>
+                    <p class="step-desc">Негізгі мақсатыңызды таңдаңыз</p>
+                    <div class="options-grid">
+                        <div class="option-card" onclick="selectOption(this, 'goal', 'weight_loss')">
+                            <i class="fas fa-fire"></i>
+                            <h4>Арықтау</h4>
+                            <p>Артық салмақтан арылу және денені қалыпқа келтіру</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'goal', 'muscle_gain')">
+                            <i class="fas fa-dumbbell"></i>
+                            <h4>Бұлшықет қалыптастыру</h4>
+                            <p>Күш жаттығулары және бодибилдинг</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'goal', 'endurance')">
+                            <i class="fas fa-running"></i>
+                            <h4>Жүрек-тамыр жүйесі</h4>
+                            <p>Кардио, жүгіру, велосипед</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'goal', 'flexibility')">
+                            <i class="fas fa-spa"></i>
+                            <h4>Икемділік</h4>
+                            <p>Йога, пилатес, растяжка</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'goal', 'general')">
+                            <i class="fas fa-heart"></i>
+                            <h4>Жалпы денсаулық</h4>
+                            <p>Жалпы формада болу және белсенділік</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="quiz-step" data-step="2">
+                    <h3>💰 Айлық бюджетіңіз қанша?</h3>
+                    <p class="step-desc">Қол жетімді баға диапазонын көрсетіңіз</p>
+                    <div class="range-container">
+                        <div class="range-value"><span id="budgetValue">25000</span> ₸</div>
+                        <input type="range" id="budgetRange" min="15000" max="100000" step="5000" value="25000" oninput="updateBudget(this.value)">
+                        <div class="range-labels">
+                            <span>15 000 ₸</span>
+                            <span>100 000 ₸</span>
+                        </div>
+                    </div>
+                    <div class="options-grid" style="margin-top: 30px;">
+                        <div class="option-card" onclick="selectOption(this, 'plan', 'economy')">
+                            <i class="fas fa-coins"></i>
+                            <h4>Эконом</h4>
+                            <p>15 000 - 25 000 ₸/ай</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'plan', 'standard')">
+                            <i class="fas fa-star"></i>
+                            <h4>Стандарт</h4>
+                            <p>25 000 - 50 000 ₸/ай</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'plan', 'premium')">
+                            <i class="fas fa-crown"></i>
+                            <h4>Премиум</h4>
+                            <p>50 000 - 100 000 ₸/ай</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="quiz-step" data-step="3">
+                    <h3>📍 Орналасу аймағы</h3>
+                    <p class="step-desc">Қай ауданда жаттығу ыңғайлы?</p>
+                    <div class="options-grid">
+                        <div class="option-card" onclick="selectOption(this, 'location', 'center')">
+                            <i class="fas fa-building"></i>
+                            <h4>Қала орталығы</h4>
+                            <p>Бизнес орталық, сауда үйлер жаны</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'location', 'north')">
+                            <i class="fas fa-arrow-up"></i>
+                            <h4>Солтүстік аудан</h4>
+                            <p>Тұрғын үй массивтері</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'location', 'south')">
+                            <i class="fas fa-arrow-down"></i>
+                            <h4>Оңтүстік аудан</h4>
+                            <p>Жаңа құрылыс аудандары</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'location', 'east')">
+                            <i class="fas fa-arrow-right"></i>
+                            <h4>Шығыс аудан</h4>
+                            <p>Өнеркәсіп және тұрғын аймақ</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'location', 'west')">
+                            <i class="fas fa-arrow-left"></i>
+                            <h4>Батыс аудан</h4>
+                            <p>Экологиялық таза аймақ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="quiz-step" data-step="4">
+                    <h3>⏰ Жаттығу уақыты</h3>
+                    <p class="step-desc">Қай уақытта жаттығуды ұнатасыз?</p>
+                    <div class="options-grid">
+                        <div class="option-card" onclick="selectOption(this, 'time', 'morning')">
+                            <i class="fas fa-sun"></i>
+                            <h4>Таңертең (6:00 - 10:00)</h4>
+                            <p>Таңғы жаттығулар, бос залдар</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'time', 'day')">
+                            <i class="fas fa-clock"></i>
+                            <h4>Күндіз (10:00 - 17:00)</h4>
+                            <p>Тыныш атмосфера, жеке жаттықтыру</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'time', 'evening')">
+                            <i class="fas fa-moon"></i>
+                            <h4>Кешкі (17:00 - 23:00)</h4>
+                            <p>Жұмыстан кейінгі жаттығулар</p>
+                        </div>
+                        <div class="option-card" onclick="selectOption(this, 'time', 'any')">
+                            <i class="fas fa-infinity"></i>
+                            <h4>Кез келген уақыт</h4>
+                            <p>24/7 жұмыс істейтін клубтар</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="quiz-step" data-step="5">
+                    <h3>🎽 Қосымша қызметтер</h3>
+                    <p class="step-desc">Қандай қосымша мүмкіндіктер керек? (бірнеше таңдау мүмкін)</p>
+                    <div class="options-grid">
+                        <div class="option-card multi" onclick="toggleMultiOption(this, 'extras', 'pool')">
+                            <i class="fas fa-swimming-pool"></i>
+                            <h4>Бассейн</h4>
+                            <p>Жүзу және аквааэробика</p>
+                        </div>
+                        <div class="option-card multi" onclick="toggleMultiOption(this, 'extras', 'sauna')">
+                            <i class="fas fa-hot-tub"></i>
+                            <h4>Сауна/Хаммам</h4>
+                            <p>Жаңарту және демалу</p>
+                        </div>
+                        <div class="option-card multi" onclick="toggleMultiOption(this, 'extras', 'group')">
+                            <i class="fas fa-users"></i>
+                            <h4>Топтық сабақтар</h4>
+                            <p>Йога, сайкл, бокс, т.б.</p>
+                        </div>
+                        <div class="option-card multi" onclick="toggleMultiOption(this, 'extras', 'pt')">
+                            <i class="fas fa-user-ninja"></i>
+                            <h4>Жеке жаттықтырушы</h4>
+                            <p>Профессионалды бағдарлама</p>
+                        </div>
+                        <div class="option-card multi" onclick="toggleMultiOption(this, 'extras', 'parking')">
+                            <i class="fas fa-car"></i>
+                            <h4>Тегін парковка</h4>
+                            <p>Автотұрақ қызметі</p>
+                        </div>
+                        <div class="option-card multi" onclick="toggleMultiOption(this, 'extras', 'nutrition')">
+                            <i class="fas fa-apple-alt"></i>
+                            <h4>Диетолог</h4>
+                            <p>Дұрыс тамақтану кеңесі</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-nav">
+                    <div style="display: flex; align-items: center; flex: 1;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 20%"></div>
+                        </div>
+                        <span class="step-counter" id="stepCounter">1 / 5</span>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-outline" id="prevBtn" onclick="prevStep()" style="display: none;">
+                            <i class="fas fa-arrow-left"></i> Артқа
+                        </button>
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+                            Келесі <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section class="section results-section" id="results">
+            <div class="results-header">
+                <div class="match-score">
+                    <i class="fas fa-star"></i>
+                    <span id="matchText">Сізге 8 клуб сәйкес келді</span>
+                </div>
+                <h2>Ұсынылған клубтар</h2>
+                <p>Сіздің талаптарыңызға ең жақсы сәйкес келетін нәтижелер</p>
+            </div>
+
+            <div class="filters-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Клуб атауы бойынша іздеу..." oninput="filterClubs()">
+                </div>
+                <div class="filter-chip active" onclick="setFilter(this, 'all')">Барлығы</div>
+                <div class="filter-chip" onclick="setFilter(this, 'premium')">Премиум</div>
+                <div class="filter-chip" onclick="setFilter(this, 'economy')">Эконом</div>
+                <div class="filter-chip" onclick="setFilter(this, 'pool')">Бассейн бар</div>
+                <div class="filter-chip" onclick="setFilter(this, '24h')">24/7</div>
+            </div>
+
+            <div class="clubs-grid" id="clubsGrid"></div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-search"></i>
+                <h3>Ештеңе табылмады</h3>
+                <p>Басқа сүзгілерді қолданып көріңіз</p>
+            </div>
+        </section>
+
+        <!-- All Clubs -->
+        <section class="section" id="clubs">
+            <div class="section-header">
+                <h2>Барлық клубтар</h2>
+                <p>Қаладағы барлық фитнес клубтардың тізімі</p>
+            </div>
+            <div class="clubs-grid" id="allClubsGrid"></div>
+        </section>
+
+        <!-- Why Choose Us -->
+        <section class="section" id="why-us">
+            <div class="section-header">
+                <h2>Неліктен FitPick?</h2>
+                <p>Біздің платформаны таңдаудың 6 себебі</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                    <h3>Зерделі іріктеу</h3>
+                    <p>Сіздің параметрлеріңізді талдап, 50+ клубтың ішінен ең сәйкесін табатын алгоритм. Бюджет, орналасу, мақсат — бәрін ескереміз.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-balance-scale"></i></div>
+                    <h3>Жан-жақты салыстыру</h3>
+                    <p>Ұнаған клубтарды баға, қызметтер, рейтинг, орналасу бойынша салыстырып, дұрыс шешім қабылдаңыз.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Тексерілген клубтар</h3>
+                    <p>Барлық клубтар нақты деректермен, фотосуреттермен және пайдаланушы пікірлерімен расталған.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                    <h3>Жылдам тіркеу</h3>
+                    <p>Таңдаған клубқа тікелей жүйеден тіркелу, күн таңдау және жаттықтырушы брондау мүмкіндігі.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-percentage"></i></div>
+                    <h3>Арнайы ұсыныстар</h3>
+                    <p>FitPick арқылы тіркелгендерге клубтардан эксклюзивті жеңілдіктер және бонустар.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                    <h3>Жеке кабинет</h3>
+                    <p>Ұнаған клубтарды сақтау, салыстыру тізімін жүргізу және таңдау тарихын қарау.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews -->
+        <section class="section" id="reviews">
+            <div class="section-header">
+                <h2>Пайдаланушы пікірлері</h2>
+                <p>Біздің қолданушылар FitPick туралы не дейді?</p>
+            </div>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">АМ</div>
+                        <div class="review-meta">
+                            <h4>Айдос Мұратов</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text">"FitPick арқасында өзіме таптырмайтын клуб таптым. Бюджетіме, уақытыма және мақсаттарыма толық сәйкес келді. Жүйе өте дәл жұмыс істейді!"</p>
+                    <div class="review-club"><i class="fas fa-dumbbell"></i> World Class — 3 ай бұрын тіркелді</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar" style="background: var(--gradient-2);">СК</div>
+                        <div class="review-meta">
+                            <h4>Сара Кенжебаева</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Салыстыру функциясы өте ыңғайлы. 3 клубты салыстырып, ең жақсысын таңдадым. Бассейн мен саунасы бар эконом нұсқа таптым."</p>
+                    <div class="review-club"><i class="fas fa-dumbbell"></i> Fitness House — 1 ай бұрын тіркелді</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">ДН</div>
+                        <div class="review-meta">
+                            <h4>Данияр Нұрланов</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Таңғы жаттығуларды ұнатамын, 24/7 жұмыс істейтін клуб керек еді. FitPick дәл сондай нұсқаны тапты. Жаттықтырушы брондау да оңай болды."</p>
+                    <div class="review-club"><i class="fas fa-dumbbell"></i> Iron Gym — 2 апта бұрын тіркелді</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar" style="background: linear-gradient(135deg, #ec4899, #f43f5e);">АТ</div>
+                        <div class="review-meta">
+                            <h4>Айгүл Темірбаева</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Йога мен пилатеске қызығамын. FitPick Yoga Space клубын ұсынды — атмосферасы керемет, топтар кішкене, жаттықтырушы назар аударады."</p>
+                    <div class="review-club"><i class="fas fa-dumbbell"></i> Yoga Space — 5 ай бұрын тіркелді</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar" style="background: linear-gradient(135deg, #06b6d4, #3b82f6);">МР</div>
+                        <div class="review-meta">
+                            <h4>Марат Рахимов</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text">"CrossFit бастағым келді, бірақ қай клубты таңдаратымды білмедім. FitPick CrossFit Box-ты ұсынды — қазір 2 ай жаттығудамын, нәтиже бар!"</p>
+                    <div class="review-club"><i class="fas fa-dumbbell"></i> CrossFit Box — 2 ай бұрын тіркелді</div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">ЕС</div>
+                        <div class="review-meta">
+                            <h4>Ерлан Смағулов</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Отбасыммен бірге жаттығу керек еді. FitPick Family Gym-ді таптым — балалар бөлмесі бар, отбасылық абонемент арзан. Барлығымыз қуаныштымыз!"</p>
+                    <div class="review-club"><i class="fas fa-dumbbell"></i> Family Gym — 4 ай бұрын тіркелді</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+        <!-- AI PERSONAL TRAINER -->
+        <section class="section" id="ai-trainer">
+            <div class="section-header">
+                <h2><i class="fas fa-robot" style="color: var(--accent);"></i> AI Жеке Жаттықтырушы</h2>
+                <p>Сіздің параметрлеріңізге негізделген жеке фитнес бағдарламасы</p>
+            </div>
+
+            <!-- STEP 1: Anthropometry -->
+            <div class="quiz-container" id="aiStep1">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div class="badge"><i class="fas fa-user"></i> Қадам 1 / 3</div>
+                    <h3 style="font-size: 28px; margin: 15px 0 10px;">Сіз туралы ақпарат</h3>
+                    <p style="color: var(--text-muted);">Дәл кеңес алу үшін негізгі параметрлеріңізді енгізіңіз</p>
+                </div>
+
+                <div class="ai-form-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-venus-mars"></i> Жыныс</label>
+                        <select id="aiGender">
+                            <option value="">Таңдаңыз</option>
+                            <option value="male">Еркек</option>
+                            <option value="female">Әйел</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-birthday-cake"></i> Жас</label>
+                        <input type="number" id="aiAge" placeholder="Мыс: 25" min="12" max="90">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-ruler-vertical"></i> Бой (см)</label>
+                        <input type="number" id="aiHeight" placeholder="Мыс: 175" min="100" max="250">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-weight"></i> Салмақ (кг)</label>
+                        <input type="number" id="aiWeight" placeholder="Мыс: 70" min="30" max="200">
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="max-width: 600px; margin: 25px auto 0; text-align: center;">
+                    <p style="font-size: 14px; color: var(--text-muted);">
+                        <i class="fas fa-shield-alt" style="color: var(--accent);"></i> 
+                        Деректер тек браузерде сақталады, серверге жіберілмейді
+                    </p>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="aiNextStep(1)" style="padding: 14px 40px;">
+                        Келесі қадам <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 2: Goal -->
+            <div class="quiz-container" id="aiStep2" style="display: none;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div class="badge"><i class="fas fa-bullseye"></i> Қадам 2 / 3</div>
+                    <h3 style="font-size: 28px; margin: 15px 0 10px;">Мақсатыңызды таңдаңыз</h3>
+                    <p style="color: var(--text-muted);">Негізгі фитнес мақсатыңызды анықтаңыз</p>
+                </div>
+
+                <div class="options-grid" style="max-width: 800px; margin: 0 auto;">
+                    <div class="option-card" onclick="selectAiGoal(this, 'weight_loss')">
+                        <i class="fas fa-fire" style="color: #ef4444;"></i>
+                        <h4>Арықтау</h4>
+                        <p>Артық салмақтан арылу, майды жағу</p>
+                    </div>
+                    <div class="option-card" onclick="selectAiGoal(this, 'muscle_gain')">
+                        <i class="fas fa-dumbbell" style="color: #f59e0b;"></i>
+                        <h4>Бұлшықет қалыптастыру</h4>
+                        <p>Күш жаттығулары, масса жинау</p>
+                    </div>
+                    <div class="option-card" onclick="selectAiGoal(this, 'endurance')">
+                        <i class="fas fa-running" style="color: #3b82f6;"></i>
+                        <h4>Төзімділік</h4>
+                        <p>Кардио, жүгіру, велосипед</p>
+                    </div>
+                    <div class="option-card" onclick="selectAiGoal(this, 'general')">
+                        <i class="fas fa-heart" style="color: #ec4899;"></i>
+                        <h4>Жалпы денсаулық</h4>
+                        <p>Жалпы форма, белсенділік</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                    <button class="btn btn-outline" onclick="aiPrevStep(2)">
+                        <i class="fas fa-arrow-left"></i> Артқа
+                    </button>
+                    <button class="btn btn-primary" onclick="aiNextStep(2)" id="aiGoalBtn" disabled>
+                        Келесі қадам <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Activity Level -->
+            <div class="quiz-container" id="aiStep3" style="display: none;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div class="badge"><i class="fas fa-chart-line"></i> Қадам 3 / 3</div>
+                    <h3 style="font-size: 28px; margin: 15px 0 10px;">Жұмыс режимі</h3>
+                    <p style="color: var(--text-muted);">Күнделікті белсенділік деңгейіңіз</p>
+                </div>
+
+                <div class="options-grid" style="max-width: 800px; margin: 0 auto;">
+                    <div class="option-card" onclick="selectAiActivity(this, 'sedentary')">
+                        <i class="fas fa-couch" style="color: var(--text-muted);"></i>
+                        <h4>Отырықшы</h4>
+                        <p>Көбінесе отырамын, минималды қозғалыс</p>
+                    </div>
+                    <div class="option-card" onclick="selectAiActivity(this, 'light')">
+                        <i class="fas fa-walking" style="color: #3b82f6;"></i>
+                        <h4>Жеңіл белсенділік</h4>
+                        <p>Күніне 30 мин жаяу жүру</p>
+                    </div>
+                    <div class="option-card" onclick="selectAiActivity(this, 'moderate')">
+                        <i class="fas fa-bicycle" style="color: #f59e0b;"></i>
+                        <h4>Орташа белсенділік</h4>
+                        <p>Аптасына 3-4 рет жаттығу</p>
+                    </div>
+                    <div class="option-card" onclick="selectAiActivity(this, 'active')">
+                        <i class="fas fa-fire-alt" style="color: #ef4444;"></i>
+                        <h4>Жоғары белсенділік</h4>
+                        <p>Күн сайын жаттығу, спорт</p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px; display: flex; gap: 15px; justify-content: center;">
+                    <button class="btn btn-outline" onclick="aiPrevStep(3)">
+                        <i class="fas fa-arrow-left"></i> Артқа
+                    </button>
+                    <button class="btn btn-primary" onclick="generateAiProgram()" id="aiGenerateBtn" disabled>
+                        <i class="fas fa-magic"></i> Бағдарламаны жасау
+                    </button>
+                </div>
+            </div>
+
+            <!-- RESULTS -->
+            <div class="quiz-container" id="aiResults" style="display: none;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div class="badge" style="background: rgba(0,212,170,0.15); border-color: rgba(0,212,170,0.3); color: var(--accent);">
+                        <i class="fas fa-check-circle"></i> Дайын!
+                    </div>
+                    <h3 style="font-size: 28px; margin: 15px 0 10px;">Сіздің жеке бағдарламаңыз</h3>
+                    <p style="color: var(--text-muted);" id="aiUserSummary"></p>
+                </div>
+
+                <!-- BMI Card -->
+                <div class="highlight-box" style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                        <div>
+                            <h4 style="color: var(--text); margin-bottom: 5px;"><i class="fas fa-calculator"></i> BMI (Дене массасы индексі)</h4>
+                            <p style="font-size: 14px; color: var(--text-muted);" id="aiBmiText"></p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 42px; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="aiBmiValue">--</div>
+                            <div style="font-size: 13px; color: var(--text-muted); margin-top: 5px;" id="aiBmiCategory">--</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar" style="margin-top: 15px;">
+                        <div class="progress-fill" id="aiBmiBar" style="width: 0%"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 5px;">
+                        <span>Арық</span><span>Норма</span><span>Артық</span><span>Толық</span>
+                    </div>
+                </div>
+
+                <!-- Calories & Macros -->
+                <div class="highlight-box" style="margin-bottom: 25px; background: linear-gradient(135deg, rgba(0,212,170,0.1), rgba(0,168,232,0.1));">
+                    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; text-align: center;">
+                        <div>
+                            <div style="font-size: 32px; font-weight: 800; color: var(--accent);" id="aiCalories">--</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">ккал/күн</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 32px; font-weight: 800; color: #fbbf24;" id="aiProtein">--</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">Белок (г)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 32px; font-weight: 800; color: #a855f7;" id="aiFat">--</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">Май (г)</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 32px; font-weight: 800; color: #3b82f6;" id="aiCarbs">--</div>
+                            <div style="font-size: 13px; color: var(--text-muted);">Көмірсу (г)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div style="display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                    <button class="btn btn-primary btn-sm ai-tab-btn active" onclick="switchAiTab('workout')" id="tab-workout">
+                        <i class="fas fa-dumbbell"></i> Жаттығулар
+                    </button>
+                    <button class="btn btn-outline btn-sm ai-tab-btn" onclick="switchAiTab('nutrition')" id="tab-nutrition">
+                        <i class="fas fa-utensils"></i> Тамақтану
+                    </button>
+                    <button class="btn btn-outline btn-sm ai-tab-btn" onclick="switchAiTab('sleep')" id="tab-sleep">
+                        <i class="fas fa-bed"></i> Ұйқы
+                    </button>
+                </div>
+
+                <!-- Content containers -->
+                <div id="aiContent-workout" class="ai-tab-content">
+                    <div id="aiWorkoutPlan"></div>
+                </div>
+                <div id="aiContent-nutrition" class="ai-tab-content" style="display: none;">
+                    <div id="aiNutritionPlan"></div>
+                </div>
+                <div id="aiContent-sleep" class="ai-tab-content" style="display: none;">
+                    <div id="aiSleepPlan"></div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-outline" onclick="resetAiTrainer()">
+                        <i class="fas fa-redo"></i> Қайта бастау
+                    </button>
+                    <button class="btn btn-primary" onclick="scrollToSection('clubs')" style="margin-left: 10px;">
+                        <i class="fas fa-dumbbell"></i> Клубты таңдау
+                    </button>
+                </div>
+            </div>
+        </section>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <i class="fas fa-dumbbell"></i>
+                    Fit<span>Pick</span>
+                </a>
+                <p>FitPick — сіздің денсаулығыңызға жол ашатын заманауи фитнес клуб ұсыныс жүйесі. Жасанды интеллект негізінде жұмыс істейді.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Навигация</h4>
+                <a href="#home">Басты бет</a>
+                <a href="#quiz">Тест</a>
+                <a href="#clubs">Клубтар</a>
+                <a href="#why-us">Неліктен біз?</a>
+                <a href="#reviews">Пікірлер</a>
+            </div>
+            <div class="footer-links">
+                <h4>Қызметтер</h4>
+                <a href="#">Клубтар тізімі</a>
+                <a href="#">Салыстыру</a>
+                <a href="#">Жаттықтырушылар</a>
+                <a href="#">Блог</a>
+            </div>
+            <div class="footer-links">
+                <h4>Байланыс</h4>
+                <a href="#"><i class="fas fa-phone"></i> +7 (777) 123-45-67</a>
+                <a href="#"><i class="fas fa-envelope"></i> info@fitpick.kz</a>
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Алматы, Қазақстан</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 FitPick. Барлық құқықтар қорғалған.</div>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-telegram"></i></a>
+                <a href="#"><i class="fab fa-whatsapp"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Favorites Button -->
+    <div class="favorites-bar">
+        <button class="fav-btn" onclick="showFavorites()">
+            <i class="fas fa-heart"></i>
+            <span class="fav-count" id="favCount">0</span>
+        </button>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div class="modal-overlay" id="compareModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-balance-scale"></i> Клубтарды салыстыру</h2>
+                <button class="modal-close" onclick="closeModal('compareModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="compareBody"></div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal-overlay" id="bookingModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2><i class="fas fa-calendar-check"></i> Тіркелу</h2>
+                <button class="modal-close" onclick="closeModal('bookingModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form class="booking-form" onsubmit="submitBooking(event)">
+                    <div class="form-group">
+                        <label>Клуб</label>
+                        <input type="text" id="bookingClub" readonly>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Аты-жөні</label>
+                            <input type="text" placeholder="Аты-жөніңіз" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Телефон</label>
+                            <input type="tel" placeholder="+7 (___) ___-__-__" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Күн</label>
+                            <input type="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Уақыт</label>
+                            <select required>
+                                <option>06:00</option><option>07:00</option><option>08:00</option>
+                                <option>09:00</option><option>10:00</option><option>11:00</option>
+                                <option>12:00</option><option>13:00</option><option>14:00</option>
+                                <option>15:00</option><option>16:00</option><option>17:00</option>
+                                <option>18:00</option><option>19:00</option><option>20:00</option>
+                                <option>21:00</option><option>22:00</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Тариф</label>
+                        <select id="bookingPlan" required>
+                            <option value="">Тарифті таңдаңыз</option>
+                            <option>Айлық абонемент</option>
+                            <option>3 айлық абонемент</option>
+                            <option>6 айлық абонемент</option>
+                            <option>Жылдық абонемент</option>
+                            <option>Бір реттік жаттығу</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Қосымша ескерту</label>
+                        <textarea rows="3" placeholder="Қосымша тілектер..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 14px;">
+                        <i class="fas fa-check"></i> Тіркелуді растау
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Favorites Modal -->
+    <div class="modal-overlay" id="favoritesModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-heart" style="color: #ef4444;"></i> Таңдаулылар</h2>
+                <button class="modal-close" onclick="closeModal('favoritesModal')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="favoritesBody">
+                <div class="empty-state">
+                    <i class="fas fa-heart" style="color: var(--border);"></i>
+                    <h3>Таңдаулылар бос</h3>
+                    <p>Клубтарды жүрек белгішесін басу арқылы сақтаңыз</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader"></div>
+        <div class="loading-text">Үздік клубтарды іріктеу<span class="loading-dots"></span></div>
+    </div>
+
+    <script>
+        // ==================== DATA ====================
+        const clubs = [
+            {
+                id: 1, name: "World Class", location: "center", area: "Байтұрсынов к-сі, 126",
+                price: 45000, plan: "premium", rating: 4.9, reviews: 342,
+                image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop",
+                features: ["pool", "sauna", "group", "pt", "parking", "nutrition"],
+                hours: "06:00 - 23:00", is24h: false,
+                description: "Премиум класстағы клуб. Жүзу бассейні, сауна, SPA, топтық сабақтар, жеке жаттықтырушылар.",
+                equipment: "Hammer Strength, Life Fitness, Technogym",
+                trainers: 25, area_sqm: 3500
+            },
+            {
+                id: 2, name: "Fitness House", location: "north", area: "Қабанбай батыр, 45",
+                price: 22000, plan: "economy", rating: 4.5, reviews: 189,
+                image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=600&h=400&fit=crop",
+                features: ["pool", "sauna", "group", "parking"],
+                hours: "07:00 - 22:00", is24h: false,
+                description: "Отбасылық фитнес клуб. Жүзу бассейні, балалар бөлмесі, топтық сабақтар.",
+                equipment: "Matrix, Precor",
+                trainers: 12, area_sqm: 2000
+            },
+            {
+                id: 3, name: "Iron Gym", location: "south", area: "Алатау ауданы, 12",
+                price: 35000, plan: "standard", rating: 4.7, reviews: 256,
+                image: "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&h=400&fit=crop",
+                features: ["pt", "parking", "nutrition"],
+                hours: "00:00 - 24:00", is24h: true,
+                description: "Күш жаттығуларына маманданған клуб. 24/7 жұмыс істейді. Пауэрлифтинг, бодибилдинг.",
+                equipment: "Rogue, Eleiko, Hammer Strength",
+                trainers: 18, area_sqm: 2800
+            },
+            {
+                id: 4, name: "Yoga Space", location: "center", area: "Желтоқсан к-сі, 89",
+                price: 28000, plan: "standard", rating: 4.8, reviews: 167,
+                image: "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=600&h=400&fit=crop",
+                features: ["group", "sauna", "nutrition"],
+                hours: "07:00 - 21:00", is24h: false,
+                description: "Йога, пилатес және медитация орталығы. Тыныш атмосфера, кішкене топтар.",
+                equipment: "Йога аксессуарлары, реформерлер",
+                trainers: 15, area_sqm: 1200
+            },
+            {
+                id: 5, name: "Power Zone", location: "east", area: "Ауэзов к-сі, 203",
+                price: 18000, plan: "economy", rating: 4.3, reviews: 98,
+                image: "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?w=600&h=400&fit=crop",
+                features: ["group", "parking"],
+                hours: "06:00 - 22:00", is24h: false,
+                description: "Бюджеттік нұсқа. Негізгі жаттығу құрылғылары, топтық сабақтар.",
+                equipment: "Bronze Gym, Technogym",
+                trainers: 8, area_sqm: 1500
+            },
+            {
+                id: 6, name: "Aqua Fitness", location: "west", area: "Гагарин даңғылы, 56",
+                price: 32000, plan: "standard", rating: 4.6, reviews: 134,
+                image: "https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?w=600&h=400&fit=crop",
+                features: ["pool", "sauna", "group", "pt"],
+                hours: "06:00 - 23:00", is24h: false,
+                description: "Аквааэробика және жүзу маманданған клуб. 25 метрлік бассейн.",
+                equipment: "Жүзу құрылғылары, кардио",
+                trainers: 14, area_sqm: 2200
+            },
+            {
+                id: 7, name: "Elite Sport", location: "center", area: "Назарбаев даңғылы, 10",
+                price: 65000, plan: "premium", rating: 4.9, reviews: 89,
+                image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=400&fit=crop",
+                features: ["pool", "sauna", "group", "pt", "parking", "nutrition"],
+                hours: "05:00 - 00:00", is24h: false,
+                description: "VIP клуб. Жеке шкафчиктер, тегін парковка, диетолог, массаж.",
+                equipment: "Technogym, Life Fitness",
+                trainers: 30, area_sqm: 5000
+            },
+            {
+                id: 8, name: "CrossFit Box", location: "north", area: "Тауелсіздік даңғылы, 78",
+                price: 30000, plan: "standard", rating: 4.7, reviews: 201,
+                image: "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&h=400&fit=crop",
+                features: ["group", "pt", "parking"],
+                hours: "06:00 - 22:00", is24h: false,
+                description: "CrossFit және функционалдық жаттығулар. WOD сабақтары, олимпиадалық ауыр атлетика.",
+                equipment: "Rogue, Concept2, Assault Bike",
+                trainers: 16, area_sqm: 1800
+            },
+            {
+                id: 9, name: "Family Gym", location: "south", area: "Рысқұлов к-сі, 156",
+                price: 20000, plan: "economy", rating: 4.4, reviews: 145,
+                image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=600&h=400&fit=crop",
+                features: ["pool", "group", "parking"],
+                hours: "07:00 - 21:00", is24h: false,
+                description: "Отбасылық фитнес. Балалар бөлмесі, отбасылық абонементтер.",
+                equipment: "Matrix, Precor",
+                trainers: 10, area_sqm: 2500
+            },
+            {
+                id: 10, name: "Night Gym", location: "east", area: "Райымбек к-сі, 34",
+                price: 25000, plan: "standard", rating: 4.5, reviews: 78,
+                image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&h=400&fit=crop",
+                features: ["pt", "parking"],
+                hours: "00:00 - 24:00", is24h: true,
+                description: "Түнгі жаттығулар үшін. 24/7 жұмыс істейді. Түнгі жаттықтырушылар бар.",
+                equipment: "Life Fitness, Hammer Strength",
+                trainers: 10, area_sqm: 1600
+            },
+            {
+                id: 11, name: "Sport Life", location: "west", area: "Саин к-сі, 67",
+                price: 38000, plan: "standard", rating: 4.6, reviews: 223,
+                image: "https://images.unsplash.com/photo-1540496905036-5937c10647a1?w=600&h=400&fit=crop",
+                features: ["pool", "sauna", "group", "pt", "parking"],
+                hours: "06:00 - 23:00", is24h: false,
+                description: "Жалпы фитнес. Барлық қызметтері бар орташа бағалық клуб.",
+                equipment: "Technogym, Matrix",
+                trainers: 20, area_sqm: 3000
+            },
+            {
+                id: 12, name: "Gold's Gym", location: "center", area: "Абылай хан к-сі, 55",
+                price: 42000, plan: "premium", rating: 4.8, reviews: 312,
+                image: "https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=600&h=400&fit=crop",
+                features: ["pool", "sauna", "group", "pt", "parking", "nutrition"],
+                hours: "05:30 - 23:30", is24h: false,
+                description: "Әлемдік бренд. Күш жаттығулары, кардио, бассейн, SPA.",
+                equipment: "Life Fitness, Hammer Strength, Rogue",
+                trainers: 28, area_sqm: 4000
+            }
+        ];
+
+        // ==================== STATE ====================
+        let currentStep = 1;
+        const totalSteps = 5;
+        let userPrefs = { goal: '', budget: 25000, plan: '', location: '', time: '', extras: [] };
+        let favorites = [];
+        let compareList = [];
+        let currentFilter = 'all';
+        let recommendedClubs = [];
+
+        // ==================== QUIZ LOGIC ====================
+        function selectOption(element, key, value) {
+            const step = element.closest('.quiz-step');
+            step.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            userPrefs[key] = value;
+        }
+
+        function toggleMultiOption(element, key, value) {
+            element.classList.toggle('selected');
+            if (element.classList.contains('selected')) {
+                if (!userPrefs[key].includes(value)) userPrefs[key].push(value);
+            } else {
+                userPrefs[key] = userPrefs[key].filter(v => v !== value);
+            }
+        }
+
+        function updateBudget(value) {
+            document.getElementById('budgetValue').textContent = parseInt(value).toLocaleString();
+            userPrefs.budget = parseInt(value);
+        }
+
+        function nextStep() {
+            // Validate current step
+            const stepEl = document.querySelector(`.quiz-step[data-step="${currentStep}"]`);
+            const hasSelection = stepEl.querySelector('.option-card.selected');
+
+            if (currentStep === 2) {
+                if (!userPrefs.plan) {
+                    showToast('Тарифті таңдаңыз', 'error');
+                    return;
+                }
+            } else if (currentStep !== 2 && !hasSelection) {
+                showToast('Нұсқаны таңдаңыз', 'error');
+                return;
+            }
+
+            if (currentStep < totalSteps) {
+                document.querySelector(`.quiz-step[data-step="${currentStep}"]`).classList.remove('active');
+                currentStep++;
+                document.querySelector(`.quiz-step[data-step="${currentStep}"]`).classList.add('active');
+                updateProgress();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.querySelector(`.quiz-step[data-step="${currentStep}"]`).classList.remove('active');
+                currentStep--;
+                document.querySelector(`.quiz-step[data-step="${currentStep}"]`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('stepCounter').textContent = `${currentStep} / ${totalSteps}`;
+            document.getElementById('prevBtn').style.display = currentStep === 1 ? 'none' : 'flex';
+
+            if (currentStep === totalSteps) {
+                document.getElementById('nextBtn').innerHTML = 'Нәтижелерді көру <i class="fas fa-check"></i>';
+            } else {
+                document.getElementById('nextBtn').innerHTML = 'Келесі <i class="fas fa-arrow-right"></i>';
+            }
+        }
+
+        function finishQuiz() {
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            setTimeout(() => {
+                calculateRecommendations();
+                document.getElementById('loadingOverlay').classList.remove('active');
+                document.getElementById('results').classList.add('active');
+                document.getElementById('quiz').style.display = 'none';
+                renderClubs(recommendedClubs, 'clubsGrid');
+                showToast(`${recommendedClubs.length} клуб табылды!`, 'success');
+
+                // Scroll to results
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        }
+
+        function calculateRecommendations() {
+            recommendedClubs = clubs.map(club => {
+                let score = 0;
+                let reasons = [];
+
+                // Budget match
+                const budgetDiff = Math.abs(club.price - userPrefs.budget);
+                if (budgetDiff <= 5000) { score += 30; reasons.push('Бюджетке толық сәйкес'); }
+                else if (budgetDiff <= 15000) { score += 20; reasons.push('Бюджетке жақын'); }
+                else if (budgetDiff <= 25000) { score += 10; }
+
+                // Plan match
+                if (club.plan === userPrefs.plan) { score += 20; reasons.push('Тариф сәйкес'); }
+
+                // Location match
+                if (club.location === userPrefs.location) { score += 25; reasons.push('Орналасу ыңғайлы'); }
+
+                // Time match
+                if (userPrefs.time === 'any' && club.is24h) { score += 15; reasons.push('24/7 жұмыс істейді'); }
+                else if (userPrefs.time === 'morning' && club.hours.startsWith('05') || club.hours.startsWith('06')) { score += 10; }
+                else if (userPrefs.time === 'evening' && (club.hours.includes('23') || club.hours.includes('24') || club.hours.includes('00'))) { score += 10; }
+
+                // Extras match
+                const extrasMatch = userPrefs.extras.filter(e => club.features.includes(e)).length;
+                score += extrasMatch * 8;
+                if (extrasMatch > 0) reasons.push(`${extrasMatch} қосымша қызмет`);
+
+                // Goal match
+                if (userPrefs.goal === 'muscle_gain' && (club.name.includes('Iron') || club.name.includes('Power') || club.name.includes('Gold'))) score += 10;
+                if (userPrefs.goal === 'flexibility' && (club.name.includes('Yoga') || club.features.includes('group'))) score += 10;
+                if (userPrefs.goal === 'endurance' && (club.features.includes('pool') || club.is24h)) score += 10;
+                if (userPrefs.goal === 'weight_loss' && club.features.includes('group')) score += 10;
+
+                // Rating bonus
+                score += (club.rating - 4) * 5;
+
+                return { ...club, matchScore: Math.min(Math.round(score), 100), matchReasons: reasons };
+            }).sort((a, b) => b.matchScore - a.matchScore);
+
+            // Mark top 3 as featured
+            recommendedClubs.forEach((club, i) => {
+                club.isFeatured = i < 3 && club.matchScore > 60;
+            });
+        }
+
+        // ==================== RENDER CLUBS ====================
+        function renderClubs(clubList, containerId) {
+            const container = document.getElementById(containerId);
+            if (!clubList.length) {
+                container.innerHTML = '';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+            document.getElementById('emptyState').style.display = 'none';
+
+            container.innerHTML = clubList.map(club => `
+                <div class="club-card ${club.isFeatured ? 'featured' : ''}" data-id="${club.id}">
+                    <div class="club-image">
+                        <img src="${club.image}" alt="${club.name}" loading="lazy">
+                        <div class="match-percentage">${club.matchScore || 95}% сәйкестік</div>
+                        <div class="club-image-overlay">
+                            <div class="club-rating">
+                                <i class="fas fa-star"></i> ${club.rating} <span>(${club.reviews} пікір)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="club-body">
+                        <div class="club-header">
+                            <div>
+                                <div class="club-name">${club.name}</div>
+                                <div class="club-location"><i class="fas fa-map-marker-alt"></i> ${club.area}</div>
+                            </div>
+                            <div class="club-price">
+                                <div class="price">${club.price.toLocaleString()} ₸</div>
+                                <div class="period">/ай</div>
+                            </div>
+                        </div>
+                        <div class="club-tags">
+                            ${club.features.map(f => `<span class="tag ${getFeatureColor(f)}">${getFeatureName(f)}</span>`).join('')}
+                            ${club.is24h ? '<span class="tag orange">24/7</span>' : ''}
+                        </div>
+                        <div class="club-features">
+                            <div class="feature"><i class="fas fa-clock"></i> ${club.hours}</div>
+                            <div class="feature"><i class="fas fa-expand"></i> ${club.area_sqm} м²</div>
+                            <div class="feature"><i class="fas fa-user-friends"></i> ${club.trainers} жаттықтырушы</div>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px; line-height: 1.5;">${club.description}</p>
+                        <div class="club-actions">
+                            <button class="btn btn-primary btn-sm" onclick="openBooking('${club.name}')">
+                                <i class="fas fa-calendar-check"></i> Тіркелу
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="toggleFavorite(${club.id}, this)">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="addToCompare(${club.id})">
+                                <i class="fas fa-balance-scale"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getFeatureName(feature) {
+            const names = { pool: 'Бассейн', sauna: 'Сауна', group: 'Топтық', pt: 'Жеке жаттықтырушы', parking: 'Парковка', nutrition: 'Диетолог' };
+            return names[feature] || feature;
+        }
+
+        function getFeatureColor(feature) {
+            return feature === 'pool' || feature === 'sauna' ? '' : 'orange';
+        }
+
+        // ==================== FILTERS ====================
+        function setFilter(element, filter) {
+            document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            currentFilter = filter;
+            filterClubs();
+        }
+
+        function filterClubs() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = recommendedClubs.length ? recommendedClubs : clubs;
+
+            if (search) {
+                filtered = filtered.filter(c => c.name.toLowerCase().includes(search) || c.area.toLowerCase().includes(search));
+            }
+
+            if (currentFilter === 'premium') filtered = filtered.filter(c => c.plan === 'premium');
+            if (currentFilter === 'economy') filtered = filtered.filter(c => c.plan === 'economy');
+            if (currentFilter === 'pool') filtered = filtered.filter(c => c.features.includes('pool'));
+            if (currentFilter === '24h') filtered = filtered.filter(c => c.is24h);
+
+            renderClubs(filtered, 'clubsGrid');
+            document.getElementById('matchText').textContent = `Сізге ${filtered.length} клуб сәйкес келді`;
+        }
+
+        // ==================== FAVORITES ====================
+        function toggleFavorite(clubId, btn) {
+            const index = favorites.indexOf(clubId);
+            if (index > -1) {
+                favorites.splice(index, 1);
+                btn.innerHTML = '<i class="fas fa-heart"></i>';
+                btn.querySelector('i').style.color = '';
+                showToast('Таңдаулылардан алынды', 'info');
+            } else {
+                favorites.push(clubId);
+                btn.innerHTML = '<i class="fas fa-heart heart-active"></i>';
+                showToast('Таңдаулыларға қосылды!', 'success');
+            }
+            document.getElementById('favCount').textContent = favorites.length;
+        }
+
+        function showFavorites() {
+            const body = document.getElementById('favoritesBody');
+            if (!favorites.length) {
+                body.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heart" style="color: var(--border); font-size: 64px;"></i>
+                        <h3>Таңдаулылар бос</h3>
+                        <p>Клубтарды жүрек белгішесін басу арқылы сақтаңыз</p>
+                    </div>
+                `;
+            } else {
+                const favClubs = clubs.filter(c => favorites.includes(c.id));
+                body.innerHTML = `<div class="clubs-grid">${favClubs.map(club => `
+                    <div class="club-card">
+                        <div class="club-image">
+                            <img src="${club.image}" alt="${club.name}">
+                        </div>
+                        <div class="club-body">
+                            <div class="club-name">${club.name}</div>
+                            <div class="club-location"><i class="fas fa-map-marker-alt"></i> ${club.area}</div>
+                            <div class="club-price" style="margin-top: 10px;">
+                                <div class="price">${club.price.toLocaleString()} ₸</div>
+                            </div>
+                            <div class="club-actions" style="margin-top: 16px;">
+                                <button class="btn btn-primary btn-sm" onclick="openBooking('${club.name}'); closeModal('favoritesModal');">
+                                    <i class="fas fa-calendar-check"></i> Тіркелу
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="removeFavorite(${club.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}</div>`;
+            }
+            document.getElementById('favoritesModal').classList.add('active');
+        }
+
+        function removeFavorite(clubId) {
+            favorites = favorites.filter(id => id !== clubId);
+            document.getElementById('favCount').textContent = favorites.length;
+            showFavorites();
+        }
+
+        // ==================== COMPARE ====================
+        function addToCompare(clubId) {
+            if (compareList.includes(clubId)) {
+                showToast('Бұл клуб салыстыру тізімінде бар', 'info');
+                return;
+            }
+            if (compareList.length >= 3) {
+                showToast('Ең көбі 3 клуб салыстыруға болады', 'error');
+                return;
+            }
+            compareList.push(clubId);
+            showToast('Салыстыру тізіміне қосылды', 'success');
+
+            if (compareList.length >= 2) {
+                setTimeout(() => showCompare(), 500);
+            }
+        }
+
+        function showCompare() {
+            if (compareList.length < 2) {
+                showToast('Кемінде 2 клуб таңдаңыз', 'error');
+                return;
+            }
+            const selected = clubs.filter(c => compareList.includes(c.id));
+            const body = document.getElementById('compareBody');
+
+            const rows = [
+                { label: 'Бағасы', key: 'price', format: v => v.toLocaleString() + ' ₸/ай' },
+                { label: 'Рейтинг', key: 'rating', format: v => '⭐ ' + v },
+                { label: 'Жұмыс уақыты', key: 'hours' },
+                { label: 'Ауданы', key: 'area_sqm', format: v => v + ' м²' },
+                { label: 'Жаттықтырушылар', key: 'trainers' },
+                { label: 'Пікірлер', key: 'reviews' },
+                { label: 'Бассейн', key: 'features', format: v => v.includes('pool') ? '✅ Бар' : '❌ Жоқ' },
+                { label: 'Сауна', key: 'features', format: v => v.includes('sauna') ? '✅ Бар' : '❌ Жоқ' },
+                { label: 'Топтық сабақтар', key: 'features', format: v => v.includes('group') ? '✅ Бар' : '❌ Жоқ' },
+                { label: 'Жеке жаттықтырушы', key: 'features', format: v => v.includes('pt') ? '✅ Бар' : '❌ Жоқ' },
+                { label: 'Парковка', key: 'features', format: v => v.includes('parking') ? '✅ Бар' : '❌ Жоқ' },
+                { label: '24/7', key: 'is24h', format: v => v ? '✅ Иә' : '❌ Жоқ' },
+            ];
+
+            body.innerHTML = `
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Сипаттама</th>
+                            ${selected.map(c => `<th>${c.name}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(row => `
+                            <tr>
+                                <td><strong>${row.label}</strong></td>
+                                ${selected.map(c => {
+                                    let val = c[row.key];
+                                    if (row.format) val = row.format(val);
+                                    return `<td>${val}</td>`;
+                                }).join('')}
+                            </tr>
+                        `).join('')}
+                        <tr>
+                            <td><strong>Әрекет</strong></td>
+                            ${selected.map(c => `
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="openBooking('${c.name}'); closeModal('compareModal');">
+                                        <i class="fas fa-calendar-check"></i> Тіркелу
+                                    </button>
+                                </td>
+                            `).join('')}
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="margin-top: 20px; text-align: center;">
+                    <button class="btn btn-outline" onclick="compareList = []; showToast('Салыстыру тазартылды', 'info'); closeModal('compareModal');">
+                        <i class="fas fa-trash"></i> Тазарту
+                    </button>
+                </div>
+            `;
+            document.getElementById('compareModal').classList.add('active');
+        }
+
+        // ==================== BOOKING ====================
+        function openBooking(clubName) {
+            document.getElementById('bookingClub').value = clubName;
+            document.getElementById('bookingModal').classList.add('active');
+        }
+
+        function submitBooking(e) {
+            e.preventDefault();
+            closeModal('bookingModal');
+            showToast('Тіркелу сәтті жіберілді! Сізге хабарлама жіберіледі.', 'success');
+            e.target.reset();
+        }
+
+        // ==================== MODAL ====================
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('active');
+            });
+        });
+
+        // ==================== TOAST ====================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            toast.innerHTML = `<i class="fas ${icons[type]}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        // ==================== NAVIGATION ====================
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Active nav on scroll
+        window.addEventListener('scroll', () => {
+            const sections = ['home', 'quiz', 'clubs', 'ai-trainer', 'why-us', 'reviews'];
+            const scrollPos = window.scrollY + 100;
+            sections.forEach(id => {
+                const section = document.getElementById(id);
+                if (section && scrollPos >= section.offsetTop && scrollPos < section.offsetTop + section.offsetHeight) {
+                    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+                    document.querySelector(`nav a[href="#${id}"]`)?.classList.add('active');
+                }
+            });
+        });
+
+        // ==================== AI TRAINER ====================
+        let aiUserData = { gender: '', age: 0, height: 0, weight: 0, goal: '', activity: '' };
+        let aiCalculated = { bmi: 0, bmr: 0, tdee: 0, calories: 0, protein: 0, fat: 0, carbs: 0 };
+
+        function aiNextStep(current) {
+            if (current === 1) {
+                aiUserData.gender = document.getElementById('aiGender').value;
+                aiUserData.age = parseInt(document.getElementById('aiAge').value);
+                aiUserData.height = parseInt(document.getElementById('aiHeight').value);
+                aiUserData.weight = parseInt(document.getElementById('aiWeight').value);
+
+                if (!aiUserData.gender || !aiUserData.age || !aiUserData.height || !aiUserData.weight) {
+                    showToast('Барлық өрісті толтырыңыз', 'error');
+                    return;
+                }
+                if (aiUserData.age < 12 || aiUserData.age > 90) {
+                    showToast('Жас 12-ден 90-ға дейін болуы керек', 'error');
+                    return;
+                }
+
+                document.getElementById('aiStep1').style.display = 'none';
+                document.getElementById('aiStep2').style.display = 'block';
+                document.getElementById('aiStep2').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function aiPrevStep(current) {
+            if (current === 2) {
+                document.getElementById('aiStep2').style.display = 'none';
+                document.getElementById('aiStep1').style.display = 'block';
+            } else if (current === 3) {
+                document.getElementById('aiStep3').style.display = 'none';
+                document.getElementById('aiStep2').style.display = 'block';
+            }
+        }
+
+        function selectAiGoal(element, goal) {
+            document.querySelectorAll('#aiStep2 .option-card').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            aiUserData.goal = goal;
+            document.getElementById('aiGoalBtn').disabled = false;
+
+            // Auto advance after short delay
+            setTimeout(() => {
+                document.getElementById('aiStep2').style.display = 'none';
+                document.getElementById('aiStep3').style.display = 'block';
+                document.getElementById('aiStep3').scrollIntoView({ behavior: 'smooth' });
+            }, 400);
+        }
+
+        function selectAiActivity(element, activity) {
+            document.querySelectorAll('#aiStep3 .option-card').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            aiUserData.activity = activity;
+            document.getElementById('aiGenerateBtn').disabled = false;
+        }
+
+        function generateAiProgram() {
+            if (!aiUserData.activity) {
+                showToast('Белсенділік деңгейін таңдаңыз', 'error');
+                return;
+            }
+
+            document.getElementById('loadingOverlay').classList.add('active');
+
+            setTimeout(() => {
+                calculateAiMetrics();
+                renderAiResults();
+
+                document.getElementById('aiStep3').style.display = 'none';
+                document.getElementById('aiResults').style.display = 'block';
+                document.getElementById('loadingOverlay').classList.remove('active');
+                document.getElementById('aiResults').scrollIntoView({ behavior: 'smooth' });
+                showToast('Жеке бағдарлама дайын!', 'success');
+            }, 1500);
+        }
+
+        function calculateAiMetrics() {
+            // BMI
+            aiCalculated.bmi = (aiUserData.weight / ((aiUserData.height / 100) ** 2)).toFixed(1);
+
+            // BMR (Mifflin-St Jeor)
+            if (aiUserData.gender === 'male') {
+                aiCalculated.bmr = Math.round(10 * aiUserData.weight + 6.25 * aiUserData.height - 5 * aiUserData.age + 5);
+            } else {
+                aiCalculated.bmr = Math.round(10 * aiUserData.weight + 6.25 * aiUserData.height - 5 * aiUserData.age - 161);
+            }
+
+            // TDEE
+            const multipliers = { sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725 };
+            aiCalculated.tdee = Math.round(aiCalculated.bmr * multipliers[aiUserData.activity]);
+
+            // Target calories based on goal
+            aiCalculated.calories = aiCalculated.tdee;
+            if (aiUserData.goal === 'weight_loss') aiCalculated.calories -= 500;
+            if (aiUserData.goal === 'muscle_gain') aiCalculated.calories += 300;
+
+            // Macros
+            const ratios = {
+                weight_loss: { p: 0.40, f: 0.30, c: 0.30 },
+                muscle_gain: { p: 0.35, f: 0.25, c: 0.40 },
+                endurance: { p: 0.25, f: 0.25, c: 0.50 },
+                general: { p: 0.30, f: 0.30, c: 0.40 }
+            };
+            const r = ratios[aiUserData.goal] || ratios.general;
+            aiCalculated.protein = Math.round((aiCalculated.calories * r.p) / 4);
+            aiCalculated.fat = Math.round((aiCalculated.calories * r.f) / 9);
+            aiCalculated.carbs = Math.round((aiCalculated.calories * r.c) / 4);
+        }
+
+        function renderAiResults() {
+            // Summary text
+            const goalNames = { weight_loss: 'арықтау', muscle_gain: 'бұлшықет қалыптастыру', endurance: 'төзімділік', general: 'жалпы денсаулық' };
+            document.getElementById('aiUserSummary').textContent = 
+                `${aiUserData.age} жас, ${aiUserData.height} см, ${aiUserData.weight} кг — мақсат: ${goalNames[aiUserData.goal] || 'жалпы денсаулық'}`;
+
+            // BMI
+            document.getElementById('aiBmiValue').textContent = aiCalculated.bmi;
+            let bmiCat, bmiColor;
+            if (aiCalculated.bmi < 18.5) { bmiCat = 'Арық'; bmiColor = '#60a5fa'; }
+            else if (aiCalculated.bmi < 25) { bmiCat = 'Қалыпты'; bmiColor = '#00d4aa'; }
+            else if (aiCalculated.bmi < 30) { bmiCat = 'Артық салмақ'; bmiColor = '#fbbf24'; }
+            else { bmiCat = 'Толық'; bmiColor = '#ef4444'; }
+
+            document.getElementById('aiBmiCategory').textContent = bmiCat;
+            document.getElementById('aiBmiCategory').style.color = bmiColor;
+            document.getElementById('aiBmiBar').style.width = Math.min((aiCalculated.bmi / 35) * 100, 100) + '%';
+            document.getElementById('aiBmiBar').style.background = `linear-gradient(90deg, #60a5fa, #00d4aa, #fbbf24, #ef4444)`;
+
+            // Calories & Macros
+            document.getElementById('aiCalories').textContent = aiCalculated.calories;
+            document.getElementById('aiProtein').textContent = aiCalculated.protein;
+            document.getElementById('aiFat').textContent = aiCalculated.fat;
+            document.getElementById('aiCarbs').textContent = aiCalculated.carbs;
+
+            // Render workout
+            renderAiWorkout();
+        }
+
+        function switchAiTab(tab) {
+            document.querySelectorAll('.ai-tab').forEach(el => {
+                el.classList.remove('active');
+                el.classList.remove('btn-primary');
+                el.classList.add('btn-outline');
+            });
+            document.getElementById('tab-' + tab).classList.add('active', 'btn-primary');
+            document.getElementById('tab-' + tab).classList.remove('btn-outline');
+
+            document.querySelectorAll('.ai-content').forEach(el => el.style.display = 'none');
+            document.getElementById('aiContent-' + tab).style.display = 'block';
+
+            if (tab === 'nutrition') renderAiNutrition();
+            if (tab === 'sleep') renderAiSleep();
+        }
+
+        function renderAiWorkout() {
+            const plans = {
+                weight_loss: [
+                    { day: 'Дүйсенбі', type: 'Кардио', exercises: [
+                        { name: 'Жүгіру (баяу темп)', sets: '30 мин' },
+                        { name: 'Велосипед', sets: '20 мин' },
+                        { name: 'Планка', sets: '3×1 мин' },
+                        { name: 'Кранчи', sets: '3×20' }
+                    ]},
+                    { day: 'Сейсенбі', type: 'Күш', exercises: [
+                        { name: 'Приседания', sets: '4×15' },
+                        { name: 'Выпады', sets: '3×12' },
+                        { name: 'Отжимания', sets: '3×15' },
+                        { name: 'Планка', sets: '3×1 мин' }
+                    ]},
+                    { day: 'Сәрсенбі', type: 'Активный демалыс', exercises: [
+                        { name: 'Йога', sets: '30 мин' },
+                        { name: 'Растяжка', sets: '20 мин' },
+                        { name: 'Шынығу', sets: '15 мин' }
+                    ]},
+                    { day: 'Бейсенбі', type: 'HIIT', exercises: [
+                        { name: 'Берпи', sets: '4×15' },
+                        { name: 'Jumping jacks', sets: '4×50' },
+                        { name: 'Альпинист', sets: '4×30' },
+                        { name: 'Скакалка', sets: '5×2 мин' }
+                    ]},
+                    { day: 'Жұма', type: 'Күш', exercises: [
+                        { name: 'Тяга гантелей', sets: '4×12' },
+                        { name: 'Жим груди', sets: '3×12' },
+                        { name: 'Подъемы на бицепс', sets: '3×15' },
+                        { name: 'Французский жим', sets: '3×12' }
+                    ]},
+                    { day: 'Сенбі', type: 'Кардио', exercises: [
+                        { name: 'Жүгіру', sets: '45 мин' },
+                        { name: 'Ходьба', sets: '20 мин' }
+                    ]},
+                    { day: 'Жексенбі', type: 'Демалыс', exercises: [
+                        { name: 'Толық қалпына келтіру', sets: '---' },
+                        { name: 'Жеңіл растяжка', sets: '10 мин' }
+                    ]}
+                ],
+                muscle_gain: [
+                    { day: 'Дүйсенбі', type: 'Кеуде + Трицепс', exercises: [
+                        { name: 'Жим штанги', sets: '4×8-10' },
+                        { name: 'Жим гантелей', sets: '3×10' },
+                        { name: 'Баттерфляй', sets: '3×12' },
+                        { name: 'Французский жим', sets: '3×10' },
+                        { name: 'Разгибания на блоке', sets: '3×15' }
+                    ]},
+                    { day: 'Сейсенбі', type: 'Спина + Бицепс', exercises: [
+                        { name: 'Тяга штанги', sets: '4×8' },
+                        { name: 'Подтягивания', sets: '4×макс' },
+                        { name: 'Тяга Т-грифа', sets: '3×10' },
+                        { name: 'Подъем штанги', sets: '4×10' },
+                        { name: 'Молотки', sets: '3×12' }
+                    ]},
+                    { day: 'Сәрсенбі', type: 'Активный демалыс', exercises: [
+                        { name: 'Кардио (баяу)', sets: '20 мин' },
+                        { name: 'Растяжка', sets: '30 мин' }
+                    ]},
+                    { day: 'Бейсенбі', type: 'Аяқтар', exercises: [
+                        { name: 'Приседания', sets: '5×8' },
+                        { name: 'Жим ногами', sets: '4×12' },
+                        { name: 'Выпады', sets: '3×10' },
+                        { name: 'Подъемы на икры', sets: '4×20' }
+                    ]},
+                    { day: 'Жұма', type: 'Иықтар + Пресс', exercises: [
+                        { name: 'Жим Арнольда', sets: '4×10' },
+                        { name: 'Махи гантелями', sets: '3×15' },
+                        { name: 'Шраги', sets: '4×12' },
+                        { name: 'Скручивания', sets: '4×25' },
+                        { name: 'Планка', sets: '3×2 мин' }
+                    ]},
+                    { day: 'Сенбі', type: 'Кардио', exercises: [
+                        { name: 'Жүгіру', sets: '30 мин' }
+                    ]},
+                    { day: 'Жексенбі', type: 'Демалыс', exercises: [
+                        { name: 'Толық қалпына келтіру', sets: '---' }
+                    ]}
+                ],
+                endurance: [
+                    { day: 'Дүйсенбі', type: 'Жүгіру', exercises: [
+                        { name: 'Жеңіл жүгіру', sets: '5 км' },
+                        { name: 'Интервалы', sets: '8×400м' },
+                        { name: 'Заминка', sets: '10 мин' }
+                    ]},
+                    { day: 'Сейсенбі', type: 'Күш', exercises: [
+                        { name: 'Приседания', sets: '3×15' },
+                        { name: 'Выпады', sets: '3×12' },
+                        { name: 'Планка', sets: '3×2 мин' }
+                    ]},
+                    { day: 'Сәрсенбі', type: 'Велосипед', exercises: [
+                        { name: 'Баяу темп', sets: '60 мин' },
+                        { name: 'Интервалы', sets: '5×3 мин' }
+                    ]},
+                    { day: 'Бейсенбі', type: 'Жүзу', exercises: [
+                        { name: 'Жүзу', sets: '1500 м' },
+                        { name: 'Интервалы', sets: '10×50 м' }
+                    ]},
+                    { day: 'Жұма', type: 'HIIT', exercises: [
+                        { name: 'Берпи', sets: '5×15' },
+                        { name: 'Скакалка', sets: '5×3 мин' },
+                        { name: 'Бокс', sets: '3×3 мин' }
+                    ]},
+                    { day: 'Сенбі', type: 'Ұзақ жүгіру', exercises: [
+                        { name: 'Жүгіру', sets: '10-15 км' }
+                    ]},
+                    { day: 'Жексенбі', type: 'Демалыс', exercises: [
+                        { name: 'Растяжка', sets: '30 мин' }
+                    ]}
+                ],
+                general: [
+                    { day: 'Дүйсенбі', type: 'Кардио', exercises: [
+                        { name: 'Жүгіру', sets: '30 мин' },
+                        { name: 'Шынығу', sets: '10 мин' }
+                    ]},
+                    { day: 'Сейсенбі', type: 'Күш', exercises: [
+                        { name: 'Приседания', sets: '3×15' },
+                        { name: 'Отжимания', sets: '3×15' },
+                        { name: 'Планка', sets: '3×1 мин' }
+                    ]},
+                    { day: 'Сәрсенбі', type: 'Йога', exercises: [
+                        { name: 'Йога', sets: '40 мин' }
+                    ]},
+                    { day: 'Бейсенбі', type: 'Кардио', exercises: [
+                        { name: 'Велосипед', sets: '40 мин' }
+                    ]},
+                    { day: 'Жұма', type: 'Күш', exercises: [
+                        { name: 'Гантель жаттығулары', sets: '30 мин' },
+                        { name: 'Растяжка', sets: '15 мин' }
+                    ]},
+                    { day: 'Сенбі', type: 'Активный демалыс', exercises: [
+                        { name: 'Жүгіру', sets: '45 мин' },
+                        { name: 'Шынығу', sets: '15 мин' }
+                    ]},
+                    { day: 'Жексенбі', type: 'Демалыс', exercises: [
+                        { name: 'Растяжка', sets: '20 мин' }
+                    ]}
+                ]
+            };
+
+            const plan = plans[aiUserData.goal] || plans.general;
+            let html = '';
+
+            plan.forEach(day => {
+                html += `
+                    <div class="workout-day">
+                        <div class="workout-day-header">
+                            <h4>${day.day}</h4>
+                            <span class="day-type">${day.type}</span>
+                        </div>
+                        <div class="exercise-list">
+                            ${day.exercises.map(ex => `
+                                <div class="exercise-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>${ex.name}</span>
+                                    <span class="sets">${ex.sets}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('aiWorkoutPlan').innerHTML = html;
+        }
+
+        function renderAiNutrition() {
+            const meals = {
+                weight_loss: [
+                    { name: 'Таңғы ас', icon: 'fa-coffee', cal: Math.round(aiCalculated.calories * 0.25), items: ['Жұмыртқа (2 дана)', 'Көкөніс салаты', 'Тамыр нан (1 кесек)'] },
+                    { name: 'Түскі ас', icon: 'fa-utensils', cal: Math.round(aiCalculated.calories * 0.35), items: ['Күріш (100г)', 'Тауық еті (150г)', 'Көкөніс (200г)'] },
+                    { name: 'Кешкі ас', icon: 'fa-moon', cal: Math.round(aiCalculated.calories * 0.30), items: ['Балық (150г)', 'Көкөніс (300г)', 'Зейтун майы (1 ас қасық)'] },
+                    { name: 'Снек', icon: 'fa-apple-alt', cal: Math.round(aiCalculated.calories * 0.10), items: ['Алма', 'Йогурт (200г)', 'Жаңғақ (30г)'] }
+                ],
+                muscle_gain: [
+                    { name: 'Таңғы ас', icon: 'fa-coffee', cal: Math.round(aiCalculated.calories * 0.25), items: ['Жұмыртқа (4 дана)', 'Күріш каша', 'Авокадо'] },
+                    { name: 'Түскі ас', icon: 'fa-utensils', cal: Math.round(aiCalculated.calories * 0.35), items: ['Макарон (150г)', 'Тауық еті (200г)', 'Көкөніс'] },
+                    { name: 'Кешкі ас', icon: 'fa-moon', cal: Math.round(aiCalculated.calories * 0.30), items: ['Сиыр еті (200г)', 'Картоп (200г)', 'Көкөніс'] },
+                    { name: 'Снек', icon: 'fa-apple-alt', cal: Math.round(aiCalculated.calories * 0.10), items: ['Банан', 'Протеин батончик', 'Жаңғақ (50г)'] }
+                ],
+                endurance: [
+                    { name: 'Таңғы ас', icon: 'fa-coffee', cal: Math.round(aiCalculated.calories * 0.25), items: ['Мұзлы каша', 'Жеміс', 'Мед'] },
+                    { name: 'Түскі ас', icon: 'fa-utensils', cal: Math.round(aiCalculated.calories * 0.35), items: ['Күріш (200г)', 'Тауық (150г)', 'Көкөніс'] },
+                    { name: 'Кешкі ас', icon: 'fa-moon', cal: Math.round(aiCalculated.calories * 0.30), items: ['Балық (150г)', 'Көкөніс (400г)', 'Картоп (150г)'] },
+                    { name: 'Снек', icon: 'fa-apple-alt', cal: Math.round(aiCalculated.calories * 0.10), items: ['Изюм', 'Жаңғақ', 'Банан'] }
+                ],
+                general: [
+                    { name: 'Таңғы ас', icon: 'fa-coffee', cal: Math.round(aiCalculated.calories * 0.25), items: ['Жұмыртқа (2 дана)', 'Көкөніс', 'Нан'] },
+                    { name: 'Түскі ас', icon: 'fa-utensils', cal: Math.round(aiCalculated.calories * 0.35), items: ['Күріш (150г)', 'Ет (150г)', 'Көкөніс'] },
+                    { name: 'Кешкі ас', icon: 'fa-moon', cal: Math.round(aiCalculated.calories * 0.30), items: ['Балық (150г)', 'Көкөніс (300г)', 'Картоп (150г)'] },
+                    { name: 'Снек', icon: 'fa-apple-alt', cal: Math.round(aiCalculated.calories * 0.10), items: ['Жеміс', 'Йогурт', 'Жаңғақ (30г)'] }
+                ]
+            };
+
+            const dayMeals = meals[aiUserData.goal] || meals.general;
+            let html = `
+                <div class="highlight-box" style="text-align: center; margin-bottom: 20px;">
+                    <p style="font-size: 16px; color: var(--text);">
+                        <strong>Күндік калория:</strong> <span class="gradient-text">${aiCalculated.calories} ккал</span> | 
+                        <strong>Белок:</strong> ${aiCalculated.protein}г | 
+                        <strong>Көмірсу:</strong> ${aiCalculated.carbs}г | 
+                        <strong>Май:</strong> ${aiCalculated.fat}г
+                    </p>
+                </div>
+            `;
+
+            dayMeals.forEach(meal => {
+                html += `
+                    <div class="meal-card">
+                        <div class="meal-header">
+                            <i class="fas ${meal.icon}" style="color: var(--accent); font-size: 24px;"></i>
+                            <h4 style="flex: 1; font-size: 16px;">${meal.name}</h4>
+                            <span class="meal-calories">~${meal.cal} ккал</span>
+                        </div>
+                        <div class="meal-items">
+                            ${meal.items.map(item => `
+                                <div class="meal-item">
+                                    <span><i class="fas fa-check" style="color: var(--accent); margin-right: 8px;"></i>${item}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('aiNutritionPlan').innerHTML = html;
+        }
+
+        function renderAiSleep() {
+            const sleepHours = aiUserData.age < 18 ? 9 : aiUserData.age < 65 ? 7 : 8;
+            const bedtime = aiUserData.goal === 'muscle_gain' ? '22:00' : '22:30';
+            const waketime = aiUserData.goal === 'muscle_gain' ? '06:00' : '06:30';
+
+            document.getElementById('aiSleepPlan').innerHTML = `
+                <div class="sleep-plan">
+                    <div class="sleep-hours">${sleepHours} сағ</div>
+                    <p style="color: var(--text-muted); font-size: 16px;">Ұсынылған ұйқы уақыты</p>
+
+                    <div class="sleep-grid">
+                        <div class="sleep-item">
+                            <i class="fas fa-moon"></i>
+                            <h5>Ұйықтау</h5>
+                            <p>${bedtime} — ${waketime}</p>
+                        </div>
+                        <div class="sleep-item">
+                            <i class="fas fa-sun"></i>
+                            <h5>Ояну</h5>
+                            <p>Бір уақытта, тіпті демалыс күндері</p>
+                        </div>
+                        <div class="sleep-item">
+                            <i class="fas fa-ban"></i>
+                            <h5>Экрансыз уақыт</h5>
+                            <p>Ұйықтардан 1 сағат бұрын телефонсыз</p>
+                        </div>
+                        <div class="sleep-item">
+                            <i class="fas fa-temperature-low"></i>
+                            <h5>Температура</h5>
+                            <p>18-20°C — ең жақсы ұйқы температурасы</p>
+                        </div>
+                        <div class="sleep-item">
+                            <i class="fas fa-wind"></i>
+                            <h5>Таза ауа</h5>
+                            <p>Ұйықтардан бұрын бөлмені желдету</p>
+                        </div>
+                        <div class="sleep-item">
+                            <i class="fas fa-mug-hot"></i>
+                            <h5>Түнгі шай</h5>
+                            <p>Мелисса, мүкжидек, жылы сүт</p>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box" style="margin-top: 25px;">
+                        <p style="font-size: 14px; color: var(--text);">
+                            <i class="fas fa-info-circle" style="color: var(--primary); margin-right: 8px;"></i>
+                            <strong>Маңызды:</strong> ${aiUserData.goal === 'muscle_gain' ? 'Бұлшықет өсімі ұйқы кезінде болады — 7-9 сағат ұйықтау қажет!' : aiUserData.goal === 'weight_loss' ? 'Толық ұйқы метаболизмді жақсартады және аштық гормонын реттейді.' : 'Сапалы ұйқы — жаттығулар нәтижесінің 30%.'}
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function resetAiTrainer() {
+            aiUserData = { gender: '', age: 0, height: 0, weight: 0, goal: '', activity: '' };
+            aiCalculated = { bmi: 0, bmr: 0, tdee: 0, calories: 0, protein: 0, fat: 0, carbs: 0 };
+
+            document.getElementById('aiResults').style.display = 'none';
+            document.getElementById('aiStep1').style.display = 'block';
+
+            // Reset inputs
+            document.getElementById('aiGender').value = '';
+            document.getElementById('aiAge').value = '';
+            document.getElementById('aiHeight').value = '';
+            document.getElementById('aiWeight').value = '';
+            document.querySelectorAll('#aiStep2 .option-card, #aiStep3 .option-card').forEach(el => el.classList.remove('selected'));
+            document.getElementById('aiGoalBtn').disabled = true;
+            document.getElementById('aiGenerateBtn').disabled = true;
+
+            showToast('Жаңа бағдарлама жасау', 'info');
+        }
+
+                // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            renderClubs(clubs, 'allClubsGrid');
+        });
+    </script>
+</body>
+</html>
